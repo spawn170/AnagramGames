@@ -1,158 +1,127 @@
-import { createApp, ref, watch } from "https://unpkg.com/vue@3/dist/vue.esm-browser.js";
+const { createApp } = Vue;
 
 createApp({
-  setup() {
-    const screen = ref("start");
-    const gameType = ref("");
-    const score = ref(0);
-    const time = ref(0);
-    const input = ref("");
-
-    // ---------- Timer ----------
-    let timerInterval = null;
-
-    const startTimer = (seconds) => {
-      clearInterval(timerInterval);
-      time.value = seconds;
-      timerInterval = setInterval(() => {
-        time.value--;
-        if (time.value <= 0) {
-          clearInterval(timerInterval);
-          screen.value = "gameover";
-        }
-      }, 1000);
-    };
-
-    // ---------- Anagram Game ----------
-    const wordsData = ref([]);
-    const currentWord = ref("");
-    const remaining = ref([]);
-
-    const loadAnagrams = async () => {
-      const res = await fetch("../data/anagrams.json");
-      const data = await res.json();
-      wordsData.value = data;
-      startAnagram();
-    };
-
-    const startAnagram = () => {
-      const array = wordsData.value[Math.floor(Math.random() * wordsData.value.length)];
-      currentWord.value = array[0];
-      remaining.value = array.slice(1);
-      score.value = 0;
-      input.value = "";
-      startTimer(60);
-    };
-
-    const submitAnagram = () => {
-      if (remaining.value.includes(input.value) && input.value !== currentWord.value) {
-        score.value++;
-        remaining.value = remaining.value.filter((w) => w !== input.value);
-      }
-      input.value = "";
-    };
-
-    // ---------- Math Game ----------
-    const num1 = ref(0);
-    const num2 = ref(0);
-
-    const startMath = () => {
-      score.value = 0;
-      input.value = "";
-      generateMathProblem();
-      startTimer(30);
-    };
-
-    const generateMathProblem = () => {
-      num1.value = Math.floor(Math.random() * 10);
-      num2.value = Math.floor(Math.random() * 10);
-    };
-
-    const submitMath = () => {
-      if (parseInt(input.value) === num1.value + num2.value) {
-        score.value++;
-        generateMathProblem();
-      }
-      input.value = "";
-    };
-
-    // ---------- Screen Controls ----------
-    const startGame = (type) => {
-      gameType.value = type;
-      if (type === "anagram") loadAnagrams();
-      else startMath();
-      screen.value = type;
-    };
-
-    const playAgain = () => {
-      if (gameType.value === "anagram") startAnagram();
-      else startMath();
-      screen.value = gameType.value;
-    };
-
-    const backToStart = () => {
-      screen.value = "start";
-    };
-
+  data() {
     return {
-      screen,
-      gameType,
-      score,
-      time,
-      input,
-      currentWord,
-      remaining,
-      num1,
-      num2,
-      startGame,
-      submitAnagram,
-      submitMath,
-      playAgain,
-      backToStart,
+      currentGame: "menu", // 'menu', 'anagram', 'math'
+      playing: false,
+      time: 0,
+      timer: null,
+      score: 0,
+
+      // Anagram game
+      anagrams: [
+        ["stop", "post", "pots", "opts", "tops", "spot"],
+        ["train", "raint", "intra", "artin", "riant"],
+        ["apple", "appel", "pepla", "pleap", "leapp"],
+        ["stone", "tones", "notes", "onest", "seton"],
+        ["light", "githl", "thgil", "lhtig", "htilg"],
+        ["chair", "rchai", "achir", "hirac", "irach"],
+        ["bread", "beard", "debar", "bared", "adreb"],
+        ["plane", "panel", "nepal", "plean", "enpal"],
+        ["earth", "hater", "rathe", "heart", "thrae"],
+        ["water", "tawer", "wreta", "ewrat", "rawet"],
+        ["mouse", "emous", "ouesm", "smeou", "mesou"]
+      ],
+      currentWord: "",
+      currentAnagramList: [],
+      guessed: [],
+      guess: "",
+
+      // Math game
+      num1: 0,
+      num2: 0,
+      answer: 0
     };
   },
-  template: `
-    <div class="container">
-      <!-- Start Screen -->
-      <div v-if="screen==='start'" class="start-screen">
-        <h1>Play2Learn</h1>
-        <button @click="startGame('anagram')" class="btn">Anagram Hunt</button>
-        <button @click="startGame('math')" class="btn">Math Facts</button>
-      </div>
+  methods: {
+    // --- Menu & navigation ---
+    selectGame(game) {
+      this.currentGame = game;
+      this.playing = false;
+      this.score = 0;
+    },
+    goHome() {
+      this.clearTimer();
+      this.currentGame = "menu";
+      this.playing = false;
+      this.score = 0;
+      this.guess = "";
+      this.answer = 0;
+      this.guessed = [];
+    },
 
-      <!-- Anagram Game -->
-      <div v-if="screen==='anagram'" class="game-screen">
-        <h2>Anagram Hunt</h2>
-        <div class="info">
-          <p>Score: {{score}}</p>
-          <p>Time Left: {{time}}s</p>
-        </div>
-        <p>Find anagrams for: <strong>{{currentWord}}</strong></p>
-        <input v-model="input" @keyup.enter="submitAnagram" placeholder="Type an anagram..." autofocus>
-        <button @click="submitAnagram" class="btn">Submit</button>
-        <button @click="backToStart" class="btn secondary">Back to Start</button>
-      </div>
+    // --- Timer ---
+    startTimer(seconds) {
+      this.clearTimer();
+      this.time = seconds;
+      this.timer = setInterval(() => {
+        this.time--;
+        if (this.time <= 0) {
+          this.clearTimer();
+          alert(`Time's up! Score: ${this.score}`);
+          this.playing = false;
+          this.goHome();
+        }
+      }, 1000);
+    },
+    clearTimer() {
+      if (this.timer) clearInterval(this.timer);
+    },
 
-      <!-- Math Game -->
-      <div v-if="screen==='math'" class="game-screen">
-        <h2>Math Facts</h2>
-        <div class="info">
-          <p>Score: {{score}}</p>
-          <p>Time Left: {{time}}s</p>
-        </div>
-        <p>Solve: {{num1}} + {{num2}} = ?</p>
-        <input type="number" v-model.number="input" @keyup.enter="submitMath" placeholder="Enter answer" autofocus>
-        <button @click="submitMath" class="btn">Submit</button>
-        <button @click="backToStart" class="btn secondary">Back to Start</button>
-      </div>
+    // --- Anagram game ---
+    startAnagramGame() {
+      this.guessed = [];
+      this.guess = "";
+      const wordArray = this.anagrams[Math.floor(Math.random() * this.anagrams.length)];
+      this.currentWord = wordArray[0]; // display first word
+      this.currentAnagramList = wordArray.slice(1); // rest are valid guesses
+      this.score = 0;
+      this.playing = true;
+      this.startTimer(60);
+    },
+    submitGuess() {
+      if (!this.guess) return;
 
-      <!-- Game Over Screen -->
-      <div v-if="screen==='gameover'" class="game-over">
-        <h2>Game Over!</h2>
-        <p>Your score: {{score}}</p>
-        <button @click="playAgain" class="btn">Play Again</button>
-        <button @click="backToStart" class="btn secondary">Back to Start</button>
-      </div>
-    </div>
-  `,
+      const guessLower = this.guess.toLowerCase();
+
+      if (guessLower === this.currentWord.toLowerCase()) {
+        alert("Cannot guess the original word!");
+      } else if (this.currentAnagramList.includes(guessLower) && !this.guessed.includes(guessLower)) {
+        this.guessed.push(guessLower);
+        this.score++;
+      } else {
+        alert("Wrong or already guessed!");
+      }
+
+      this.guess = "";
+
+      // Pick new word if all anagrams found
+      if (this.guessed.length >= this.currentAnagramList.length) {
+        this.startAnagramGame();
+      }
+    },
+
+    // --- Math game ---
+    startMathGame() {
+      this.score = 0;
+      this.playing = true;
+      this.generateMathProblem();
+      this.startTimer(30);
+    },
+    generateMathProblem() {
+      this.num1 = Math.floor(Math.random() * 20);
+      this.num2 = Math.floor(Math.random() * 20);
+    },
+    submitAnswer() {
+      if (this.answer === this.num1 + this.num2) {
+        this.score++;
+        this.answer = 0;
+        this.generateMathProblem();
+      } else {
+        alert("Incorrect! Try again.");
+        this.answer = 0;
+      }
+    }
+  }
 }).mount("#app");

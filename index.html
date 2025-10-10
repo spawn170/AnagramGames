@@ -1,14 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Play2Learn Vue</title>
-  <link rel="stylesheet" href="./src/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Play2Learn - Anagram & Math Games</title>
+  <link rel="stylesheet" href="./src/css/style.css" />
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-  <div id="app"></div>
-  <!-- JS is now in components folder -->
+  <div id="app">
+    <header>
+      <h1>🎮 Play2Learn</h1>
+      <p>Sharpen your brain with words and numbers!</p>
+    </header>
+
+    <!-- MENU -->
+    <main v-if="currentGame === 'menu'">
+      <h2>Select a Game</h2>
+      <nav>
+        <button @click="selectGame('anagram')">Play Anagrams</button>
+        <button @click="selectGame('math')">Play Math Facts</button>
+      </nav>
+    </main>
+
+    <!-- ANAGRAM -->
+    <section v-if="currentGame === 'anagram'">
+      <h2>Anagram Hunt</h2>
+
+      <div v-if="!playing">
+        <button @click="startAnagramGame">Start Game</button>
+      </div>
+
+      <div v-if="playing">
+        <p>
+          <strong :class="{danger: time < 10}">Time: {{ time }}s</strong> |
+          <strong>Score: {{ score }}</strong>
+        </p>
+        <h3>Word: {{ currentWord }}</h3>
+        <input v-model="guess" @keyup.enter="submitGuess" placeholder="Type an anagram..." />
+        <ul>
+          <li v-for="g in guessed" :key="g">{{ g }}</li>
+        </ul>
+      </div>
+
+      <button class="back-btn" @click="goHome">⬅️ Back to Menu</button>
+    </section>
+
+    <!-- MATH -->
+    <section v-if="currentGame === 'math'">
+      <h2>Math Facts Practice</h2>
+
+      <div v-if="!playing">
+        <button @click="startMathGame">Start Game</button>
+      </div>
+
+      <div v-if="playing">
+        <p>
+          <strong :class="{danger: time < 10}">Time: {{ time }}s</strong> |
+          <strong>Score: {{ score }}</strong>
+        </p>
+        <h3>{{ num1 }} + {{ num2 }} = ?</h3>
+        <input v-model.number="answer" @keyup.enter="submitAnswer" placeholder="Your answer" />
+      </div>
+
+      <button class="back-btn" @click="goHome">⬅️ Back to Menu</button>
+    </section>
+
+    <footer>
+      <p>Made with ❤️ by Ty Trapps</p>
+    </footer>
+  </div>
+
   <script type="module" src="./src/components/main.js"></script>
 </body>
 </html>
