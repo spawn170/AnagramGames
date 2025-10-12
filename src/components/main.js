@@ -12,27 +12,27 @@ createApp({
       // Anagram game
       dictionary: [
         // stop
-        "stop","post","pots","opts","tops","spot","top","pot","opt","so","to","op",
+        "post","pots","opt","tops","spot","top","pot","so","to","op",
         // train
-        "train","rain","intra","artin","riant","ran","rat","tan","tin","ant","tar","air",
+        "rain","anti","rat","tar","art","tan","ran","nit","tin","an","at","it","in",
         // apple
-        "apple","appel","pepla","pleap","pal","lap","ape","pea","ale","app",
+        "appel","pal","ape","lap","plea","peal","ale","lap","lea","pa",
         // stone
-        "stone","tones","notes","onest","seton","note","not","tone","on","to","no","net","ten",
+        "tones","notes","tone","note","ones","nest","sent","set","son","ten","net","toe","one","not","so","to","on",
         // light
-        "light","hit","lit","git","hi","it","ti",
+        "hilt","lit","hit","git","hi","it",
         // chair
-        "chair","arc","air","chi","har","rah","ah","hi","ahc",
+        "arch","rich","char","hair","ahi","air","arc","car","chi","ha","ah",
         // bread
-        "bread","beard","debar","bared","adreb","be","ad","red","dab","ear","are","bed",
+        "beard","bared","bear","bare","read","dare","ear","era","are","red","bed","bad","bar","dab","rad","ad","be","are",
         // plane
-        "plane","panel","nepal","plean","enpal","pan","nap","ale","pea","pen","lap","pal",
+        "panel","penal","nepal","pane","lean","lane","plan","plea","peal","nap","pan","pen","pal","ape","ale","lap","pea","an","pa",
         // earth
-        "earth","hater","rathe","heart","thrae","he","her","hat","tar","rat","art","ear",
+        "heart","hater","heat","hear","hare","hart","rate","eat","tea","tar","rat","art","era","ear","hat","her","at","he","ah","er",
         // water
-        "water","tawer","wreta","ewrat","rawet","war","tar","rat","ate","ear","tea","wet",
+        "ware","wear","wart","rate","tare","war","ate","eat","tea","tar","rat","art","awe","raw","ear","era","wet","at","we","aw","er",
         // mouse
-        "mouse","emous","ouesm","smeou","mesou","use","sum","so","me","us","mo"
+        "muse","some","emu","use","sum","so","me","us","so","um",
       ],
       currentWord: "",
       possibleAnagrams: [],
@@ -100,13 +100,13 @@ createApp({
       const guessLower = this.guess.toLowerCase();
 
       if (guessLower === this.currentWord.toLowerCase()) {
-        alert("Cannot guess the original word!");
+        alert("You cannot guess the original word.");
       } else if (!this.isValidAnagram(guessLower, this.currentWord)) {
-        alert("Invalid letters! Use letters from the original word.");
+        alert("Invalid letters. Use letters from the original word.");
       } else if (!this.dictionary.includes(guessLower)) {
-        alert("Not a valid word in the dictionary!");
+        alert("Not a valid word in the dictionary.");
       } else if (this.guessed.includes(guessLower)) {
-        alert("Already guessed!");
+        alert("Already guessed.");
       } else {
         this.guessed.push(guessLower);
         this.score++;
