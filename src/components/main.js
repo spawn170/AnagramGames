@@ -8,50 +8,55 @@ createApp({
       time: 0,
       timer: null,
       score: 0,
+      selectedLength: "",
 
-      // Anagram game
+      // Anagram game data
       dictionary: [
         // stop
-        "post","pots","opt","tops","spot","top","pot","so","to","op",
+        "stop","post","pots","opt","tops","spot","top","pot","so","to","op",
         // train
-        "rain","anti","rat","tar","art","tan","ran","nit","tin","an","at","it","in",
+        "train","rain","anti","rat","tar","art","tan","ran","nit","tin","an","at","it","in",
         // apple
-        "appel","pal","ape","lap","plea","peal","ale","lap","lea","pa",
+        "apple","appel","pal","ape","lap","plea","peal","ale","lea","pa",
         // stone
-        "tones","notes","tone","note","ones","nest","sent","set","son","ten","net","toe","one","not","so","to","on",
+        "stone","tones","notes","tone","note","ones","nest","sent","set","son","ten","net","toe","one","not","so","to","on",
         // light
-        "hilt","lit","hit","git","hi","it",
+        "light","hilt","lit","hit","git","hi","it",
         // chair
-        "arch","rich","char","hair","ahi","air","arc","car","chi","ha","ah",
+        "chair","arch","rich","char","hair","ahi","air","arc","car","chi","ha","ah",
         // bread
-        "beard","bared","bear","bare","read","dare","ear","era","are","red","bed","bad","bar","dab","rad","ad","be","are",
+        "bread","beard","bared","bear","bare","read","dare","ear","era","are","red","bed","bad","bar","dab","rad","ad","be",
         // plane
-        "panel","penal","nepal","pane","lean","lane","plan","plea","peal","nap","pan","pen","pal","ape","ale","lap","pea","an","pa",
+        "plane","panel","penal","nepal","pane","lean","leap","lane","plan","plea","peal","nap","pan","pen","pal","ape","ale","lap","pea","an","pa",
         // earth
-        "heart","hater","heat","hear","hare","hart","rate","eat","tea","tar","rat","art","era","ear","hat","her","at","he","ah","er",
+        "earth","heart","hater","heat","hear","hare","hart","rate","eat","tea","tar","rat","art","era","ear","hat","her","at","he","ah","er",
         // water
-        "ware","wear","wart","rate","tare","war","ate","eat","tea","tar","rat","art","awe","raw","ear","era","wet","at","we","aw","er",
+        "water","ware","wear","wart","rate","tare","war","ate","eat","tea","tar","rat","art","awe","raw","ear","era","wet","at","we","aw","er",
         // mouse
-        "muse","some","emu","use","sum","so","me","us","so","um",
+        "mouse","muse","some","emu","use","sum","so","me","us","um"
       ],
       currentWord: "",
+      shuffledWord: "",
       possibleAnagrams: [],
       guessed: [],
       guess: "",
 
-      // Math game
+      // Math game data
       num1: 0,
       num2: 0,
       answer: 0
     };
   },
+
   methods: {
     // --- Menu & navigation ---
     selectGame(game) {
       this.currentGame = game;
       this.playing = false;
       this.score = 0;
+      this.selectedLength = "";
     },
+
     goHome() {
       this.clearTimer();
       this.currentGame = "menu";
@@ -60,6 +65,8 @@ createApp({
       this.guess = "";
       this.answer = 0;
       this.guessed = [];
+      this.currentWord = "";
+      this.shuffledWord = "";
     },
 
     // --- Timer ---
@@ -82,31 +89,56 @@ createApp({
 
     // --- Anagram game ---
     startAnagramGame() {
+      if (!this.selectedLength) {
+        alert("Please select a word length before starting!");
+        return;
+      }
+
       this.guessed = [];
       this.guess = "";
-      // Pick a random word from dictionary with length >= 4
-      const longWords = this.dictionary.filter(w => w.length >= 4);
-      this.currentWord = longWords[Math.floor(Math.random() * longWords.length)];
-      // Compute all possible words (subwords) from dictionary
-      this.possibleAnagrams = this.dictionary.filter(w => this.isValidAnagram(w, this.currentWord) && w !== this.currentWord);
+
+      // Pick random word of the chosen length
+      const words = this.dictionary.filter(
+        (w) => w.length === this.selectedLength
+      );
+
+      if (words.length === 0) {
+        alert(`No words of length ${this.selectedLength} found!`);
+        return;
+      }
+
+      this.currentWord = words[Math.floor(Math.random() * words.length)];
+      this.shuffledWord = this.shuffleWord(this.currentWord);
+
+      // Find all possible valid anagrams
+      this.possibleAnagrams = this.dictionary.filter(
+        (w) => this.isValidAnagram(w, this.currentWord) && w !== this.currentWord
+      );
+
       this.score = 0;
       this.playing = true;
       this.startTimer(60);
     },
 
+    shuffleWord(word) {
+      return word
+        .split("")
+        .sort(() => Math.random() - 0.5)
+        .join("");
+    },
+
     submitGuess() {
       if (!this.guess) return;
-
       const guessLower = this.guess.toLowerCase();
 
       if (guessLower === this.currentWord.toLowerCase()) {
-        alert("You cannot guess the original word.");
+        alert("You cannot guess the original word!");
       } else if (!this.isValidAnagram(guessLower, this.currentWord)) {
-        alert("Invalid letters. Use letters from the original word.");
+        alert("Invalid letters. Use only letters from the original word.");
       } else if (!this.dictionary.includes(guessLower)) {
         alert("Not a valid word in the dictionary.");
       } else if (this.guessed.includes(guessLower)) {
-        alert("Already guessed.");
+        alert("Already guessed!");
       } else {
         this.guessed.push(guessLower);
         this.score++;
@@ -114,19 +146,18 @@ createApp({
 
       this.guess = "";
 
-      // If all possible anagrams/subwords guessed, move to next word
       if (this.guessed.length >= this.possibleAnagrams.length) {
-        alert(`All words for "${this.currentWord}" found! Moving to next word.`);
+        alert(`All possible words for "${this.currentWord}" found!`);
         this.startAnagramGame();
       }
     },
 
     isValidAnagram(word, original) {
-      const originalLetters = original.split("");
+      const letters = original.split("");
       for (let letter of word) {
-        const index = originalLetters.indexOf(letter);
-        if (index === -1) return false;
-        originalLetters.splice(index, 1);
+        const idx = letters.indexOf(letter);
+        if (idx === -1) return false;
+        letters.splice(idx, 1);
       }
       return true;
     },
@@ -138,10 +169,12 @@ createApp({
       this.generateMathProblem();
       this.startTimer(30);
     },
+
     generateMathProblem() {
       this.num1 = Math.floor(Math.random() * 20);
       this.num2 = Math.floor(Math.random() * 20);
     },
+
     submitAnswer() {
       if (this.answer === this.num1 + this.num2) {
         this.score++;
@@ -151,6 +184,6 @@ createApp({
         alert("Incorrect! Try again.");
         this.answer = 0;
       }
-    }
-  }
+    },
+  },
 }).mount("#app");
