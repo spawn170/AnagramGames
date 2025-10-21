@@ -1,23 +1,70 @@
-# Anagrams Game
+Anagrams & Math Facts Game
 
-A fun word game built with **React** where players unscramble letters to guess words. Users can select a word length and try to find the correct word from a set of letters. Perfect for testing your vocabulary and having some brain-teasing fun!
+A fun educational game built with React where players can challenge their vocabulary and math skills.
 
----
+Anagrams Game: Unscramble letters to guess words of a selected length.
 
-## 🎮 Features
+Math Facts Game: Answer random addition questions under a time limit.
 
-- Select the length of the word you want to play with.
-- Random word selection from a predefined list of words.
-- Interactive UI built with React.
-- Keeps track of guesses and provides hints.
-- Responsive design for desktop and mobile.
+Perfect for testing your brain in both wordplay and arithmetic!
 
----
+🎮 Features
+Anagrams Game
 
-## 🛠️ Installation
+Select the length of the word you want to play with.
 
-1. **Clone the repository:**
+Random word selection from a predefined dictionary.
 
-```bash
-git clone https://github.com/your-username/anagrams-game.git
-cd anagrams-game
+Submit guesses and track your score.
+
+Displays feedback for correct, incorrect, and repeated guesses.
+
+Responsive UI for desktop and mobile.
+
+Math Facts Game
+
+Random addition questions are generated on the fly.
+
+Tracks your score for correct answers.
+
+Provides immediate feedback for incorrect answers without interrupting the timer.
+
+Time-limited challenges to keep the game exciting.
+
+🛠️ Installation
+
+Clone the repository:
+
+git clone https://github.com/your-username/anagrams-math-game.git
+cd anagrams-math-game
+
+
+Install dependencies:
+
+npm install
+
+
+Run the app locally:
+
+npm start
+
+
+Open your browser at http://localhost:3000 to play.
+
+📝 Usage
+
+Choose a game from the menu: Anagrams or Math Facts.
+
+For Anagrams, select a word length and try to guess the hidden word.
+
+For Math Facts, answer as many addition problems as you can before the timer runs out.
+
+Your score and feedback are displayed in real-time.
+
+🔧 Technologies Used
+
+React
+
+JavaScript (ES6+)
+
+CSS / Responsive design
