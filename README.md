@@ -90,7 +90,7 @@ Then open your browser and visit:
 
 ***
 
-**🚀 Future Enhancements
+## 🚀 Future Enhancements
 
 - Subtraction, multiplication & division game modes
 
